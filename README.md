@@ -34,8 +34,7 @@ Apply this bundle on one node as a start if the telegraf influxdb database hasn'
   * [atlassian-bitbucket](https://github.com/rullmann/bundlewrap-atlassian-bitbucket)
   * [atlassian-bamboo](https://github.com/rullmann/bundlewrap-atlassian-bamboo)
   * [xmr-stak](https://github.com/rullmann/bundlewrap-xmr-stak)
-    * A config file is reqired and will not be managed by this bundle
-    * Please add the config file (naming scheme: `<node.name>.xmr-stak.config.json`) to the data folder `data/telegraf/files/`
+    * Defaults to http port 8080. http service must be enabled but can be configured in the xmr-stak bundle
   * Any generic Java VM by setting up proper metadata
   * Any generic Tomcat by setting up proper metadata
 

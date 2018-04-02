@@ -137,28 +137,9 @@ if node.has_bundle('atlassian-confluence'):
     }
 
 if node.has_bundle('xmr-stak'):
-    directories['/usr/local/src/PyMinerMonitor'] = {
-        'mode': '0700',
-        'owner': 'telegraf',
-    }
-
-    git_deploy['/usr/local/src/PyMinerMonitor'] = {
-        'needs': ['directory:/usr/local/src/PyMinerMonitor'],
-        'repo': 'https://github.com/Jamesits/PyMinerMonitor.git',
-        'rev': 'master',
-        'triggers': ['svc_systemd:telegraf:restart'],
-    }
-
-    files['/usr/local/src/PyMinerMonitor/config.json'] = {
-        'mode': '0600',
-        'source': '{}.xmr-stak.config.json'.format(node.name),
-        'owner': 'telegraf',
-        'triggers': ['svc_systemd:telegraf:restart'],
-        'needs': ['git_deploy:/usr/local/src/PyMinerMonitor'],
-    }
-
-    files['/etc/telegraf/telegraf.d/pyminermonitor.conf'] = {
+    files['/etc/telegraf/telegraf.d/xmr-stak.conf'] = {
         'mode': '0444',
+        'content_type': 'mako',
         'needs': ['pkg_dnf:telegraf'],
         'triggers': ['svc_systemd:telegraf:restart'],
     }
