@@ -60,5 +60,15 @@ Apply this bundle on one node as a start if the telegraf influxdb database hasn'
             'haproxy': { # optional
                 'stats_url': 'http://127.0.0.1:11111/stats',
             },
+            'custom_configs': { # optional, add custom configs detailed below
+                'someconfig',
+            },
         },
     }
+
+### Custom Configurations
+
+This bundle allows you to add custom telegraf configuration files. This may be useful if you want to monitor a webservice or grab data from other api not related to any of your bundles.
+Simply create the directory `data/telegraf/files/` within your bundlewrap repo and put the config file in the format `${node.name}.friendlyname` in there.
+For example our node name is `foo` and our config name is `bar`: `data/telegraf/files/foo.bar`
+This would result in the creation of the file `/etc/telegraf/telegraf.d/bar.conf` on node `foo`.
