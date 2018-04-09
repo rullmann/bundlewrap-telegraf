@@ -26,6 +26,8 @@ directories = {}
 
 git_deploy = {}
 
+actions = {}
+
 if node.has_bundle('nginx'):
     files['/etc/telegraf/telegraf.d/nginx.conf'] = {
         'owner': 'telegraf',
@@ -168,6 +170,44 @@ if node.metadata.get('telegraf', {}).get('collectd_input', {}):
         'needs': ['pkg_dnf:telegraf'],
         'triggers': ['svc_systemd:telegraf:restart'],
     }
+
+    if node.has_bundle('firewalld'):
+        if node.metadata.get('telegraf', {}).get('firewalld_permitted_zones'):
+            for zone in node.metadata.get('telegraf', {}).get('firewalld_permitted_zones'):
+                actions['firewalld_add_telegraf_collectd_zone_{}'.format(zone)] = {
+                    'command': 'firewall-cmd --permanent --zone={} --add-port=25826/udp',
+                    'unless': 'firewall-cmd --zone={} --list-ports | grep "25826/udp"',
+                    'cascade_skip': False,
+                    'needs': ['pkg_dnf:firewalld'],
+                    'triggers': ['action:firewalld_reload'],
+                }
+        elif node.metadata.get('firewalld', {}).get('default_zone'):
+            default_zone = node.metadata.get('firewalld', {}).get('default_zone')
+            actions['firewalld_add_telegraf_collectd_zone_{}'.format(default_zone)] = {
+                'command': 'firewall-cmd --permanent --zone={} --add-port=25826/udp',
+                'unless': 'firewall-cmd --zone={} --list-ports | grep "25826/udp"',
+                'cascade_skip': False,
+                'needs': ['pkg_dnf:firewalld'],
+                'triggers': ['action:firewalld_reload'],
+            }
+        elif node.metadata.get('firewalld', {}).get('custom_zones', False):
+            for interface in node.metadata['interfaces']:
+                custom_zone = node.metadata.get('interfaces', {}).get(interface).get('firewalld_zone')
+                actions['firewalld_add_telegraf_collectd_zone_{}'.format(custom_zone)] = {
+                    'command': 'firewall-cmd --permanent --zone={} --add-port=25826/udp',
+                    'unless': 'firewall-cmd --zone={} --list-ports | grep "25826/udp"',
+                    'cascade_skip': False,
+                    'needs': ['pkg_dnf:firewalld'],
+                    'triggers': ['action:firewalld_reload'],
+                }
+        else:
+            actions['firewalld_add_telegraf_collectd'] = {
+                'command': 'firewall-cmd --permanent --add-port=25826/udp',
+                'unless': 'firewall-cmd --list-ports | grep "25826/udp"',
+                'cascade_skip': False,
+                'needs': ['pkg_dnf:firewalld'],
+                'triggers': ['action:firewalld_reload'],
+            }
 
 for config in node.metadata.get('telegraf', {}).get('custom_configs', {}):
     files['/etc/telegraf/telegraf.d/{}.conf'.format(config)] = {
