@@ -18,6 +18,16 @@ def dnf(metadata):
         )
     return metadata, DONE
 
+@metadata_processor
+def firewalld(metadata):
+    if node.has_bundle('firewalld'):
+        metadata.setdefault('firewalld', {})
+        metadata['firewalld'].setdefault('ports')
+        for port in ['25826/udp']:
+            if port not in metadata['firewalld']['ports']:
+                metadata['firewalld']['ports'].append(port)
+
+    return metadata, DONE
 
 @metadata_processor
 def sudo(metadata):

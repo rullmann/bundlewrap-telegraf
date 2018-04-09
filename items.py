@@ -144,6 +144,17 @@ if node.has_bundle('xmr-stak'):
         'triggers': ['svc_systemd:telegraf:restart'],
     }
 
+if node.metadata.get('telegraf', {}).get('collectd_input', {}):
+    files['/etc/telegraf/telegraf.d/collectd.conf'] = {
+        'mode': '0444',
+        'content_type': 'mako',
+        'needs': ['pkg_dnf:telegraf'],
+        'triggers': ['svc_systemd:telegraf:restart'],
+        'context': {
+            'server': node.metadata.get('telegraf', {}).get('collectd_input', {}),
+        },
+    }
+
 for config in node.metadata.get('telegraf', {}).get('custom_configs', {}):
     files['/etc/telegraf/telegraf.d/{}.conf'.format(config)] = {
         'source': '{}.{}'.format(node.name, config),

@@ -21,6 +21,8 @@ Apply this bundle on one node as a start if the telegraf influxdb database hasn'
   * [nginx](https://github.com/rullmann/bundlewrap-nginx)
   * [php](https://github.com/rullmann/bundlewrap-php)
   * [chrony](https://github.com/rullmann/bundlewrap-chrony)
+  * [collectd-minimal](https://github.com/rullmann/bundlewrap-collectd-minimal)
+    * in order to receive collectd data
   * [haproxy](https://github.com/rullmann/bundlewrap-haproxy)
     * Please read the notes regarding integration inside the haproxy bundle!
   * [hddtemp](https://github.com/rullmann/bundlewrap-hddtemp)
@@ -60,11 +62,19 @@ Apply this bundle on one node as a start if the telegraf influxdb database hasn'
             'haproxy': { # optional
                 'stats_url': 'http://127.0.0.1:11111/stats',
             },
+            'collectd_input': {
+                'ip': '127.0.0.1', # required, on which ip to listen for incoming collectd statistics
+            },
             'custom_configs': { # optional, add custom configs detailed below
                 'someconfig',
             },
         },
     }
+
+### collectd Input
+
+Enabling this option and setting the metadata will create an additional config and open firewalld to accept these connections.
+In combination with the [collectd-minimal](https://github.com/rullmann/bundlewrap-collectd-minimal) bundle this allows you to retrieve and store data for special services from collectd.
 
 ### Custom Configurations
 
