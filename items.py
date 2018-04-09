@@ -154,6 +154,20 @@ if node.metadata.get('telegraf', {}).get('collectd_input', {}):
             'server': node.metadata.get('telegraf', {}).get('collectd_input', {}),
         },
     }
+    files['/etc/telegraf/collectd_auth_file'] = {
+        'mode': '0444',
+        'content_type': 'mako',
+        'needs': ['pkg_dnf:telegraf'],
+        'triggers': ['svc_systemd:telegraf:restart'],
+        'context': {
+            'server': node.metadata.get('telegraf', {}).get('collectd_input', {}),
+        },
+    }
+    files['/etc/telegraf/collectd_types.db'] = {
+        'mode': '0444',
+        'needs': ['pkg_dnf:telegraf'],
+        'triggers': ['svc_systemd:telegraf:restart'],
+    }
 
 for config in node.metadata.get('telegraf', {}).get('custom_configs', {}):
     files['/etc/telegraf/telegraf.d/{}.conf'.format(config)] = {

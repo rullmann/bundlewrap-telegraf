@@ -64,6 +64,8 @@ Apply this bundle on one node as a start if the telegraf influxdb database hasn'
             },
             'collectd_input': {
                 'ip': '127.0.0.1', # required, on which ip to listen for incoming collectd statistics
+                'username': 'someuser', # required, the servers username for incoming connections
+                'password': 'supersecretpw', # required, the servers password for incoming connections
             },
             'custom_configs': { # optional, add custom configs detailed below
                 'someconfig',
