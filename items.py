@@ -1,14 +1,16 @@
-pkg_dnf = {
-    'telegraf': {
-        'needs': ['action:dnf_makecache'],
-    },
-}
+pkg_dnf = {}
 
 svc_systemd = {
     'telegraf': {
         'needs': ['pkg_dnf:telegraf'],
     },
 }
+
+directories = {}
+
+git_deploy = {}
+
+actions = {}
 
 files = {
     '/etc/telegraf/telegraf.conf': {
@@ -22,11 +24,10 @@ files = {
     },
 }
 
-directories = {}
-
-git_deploy = {}
-
-actions = {}
+if not node.metadata.get('telegraf', {}).get('binary_install', False):
+    pkg_dnf['telegraf'] = {
+        'needs': ['action:dnf_makecache'],
+    }
 
 if node.has_bundle('nginx'):
     files['/etc/telegraf/telegraf.d/nginx.conf'] = {
