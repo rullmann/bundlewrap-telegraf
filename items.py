@@ -11,7 +11,7 @@ users = {}
 svc_systemd = {}
 
 if node.metadata.get('telegraf', {}).get('binary_install', False) == False:
-    telegraf_dependency = telegraf_dependency
+    telegraf_dependency = 'pkg_dnf:telegraf'
     pkg_dnf['telegraf'] = {
         'needs': ['action:dnf_makecache'],
     }
