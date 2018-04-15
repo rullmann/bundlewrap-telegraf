@@ -70,6 +70,7 @@ Apply this bundle on one node as a start if the telegraf influxdb database hasn'
             'custom_configs': { # optional, add custom configs detailed below
                 'someconfig',
             },
+            'binary_install': False, # optional, installs telegraf armhf binary (e.g. for Raspberry Pi 3)
         },
     }
 
@@ -77,6 +78,12 @@ Apply this bundle on one node as a start if the telegraf influxdb database hasn'
 
 Enabling this option and setting the metadata will create an additional config and open firewalld to accept these connections.
 In combination with the [collectd-minimal](https://github.com/rullmann/bundlewrap-collectd-minimal) bundle this allows you to retrieve and store data for special services from collectd.
+
+### Binary Install form armhf
+
+InfluxData provides repositories for various distributions, but only limited support for architectures. Therefore on some systems like armhf architecture a binary install is required.
+Enabling this option will not use `pkg_dnf` items. Instead it will deploy an install script and perform other necessary steps to get telegraf up and running.
+Simply set `binary_install` to `True` to use this option.
 
 ### Custom Configurations
 

@@ -1,8 +1,61 @@
 pkg_dnf = {}
 
-svc_systemd = {
-    'telegraf': {
-        'needs': ['pkg_dnf:telegraf'],
+actions = {}
+
+files = {}
+
+symlinks = {}
+
+users = {}
+
+svc_systemd = {}
+
+if node.metadata.get('telegraf', {}).get('binary_install', False) == False:
+    telegraf_dependency = telegraf_dependency
+    pkg_dnf['telegraf'] = {
+        'needs': ['action:dnf_makecache'],
+    }
+else:
+    telegraf_dependency = 'action:deploy_telegraf_binary'
+    telegraf_version = node.metadata.get('telegraf', {}).get('version', '1.5.3')
+    files['/usr/local/bin/install_telegraf_binary'] = {
+        'mode': '0700',
+        'content_type': 'mako',
+        'context': {
+            'telegraf_version': telegraf_version,
+        },
+    }
+    actions['symlink_systemd_service'] = {
+        'command': '/usr/bin/systemctl link /usr/lib/telegraf/scripts/telegraf.service',
+        'unless': 'file -E /usr/lib/telegraf/scripts/telegraf.service',
+        'needs': ['file:/usr/local/bin/install_telegraf_binary'],
+        'triggered': True,
+        'triggers': ['action:systemd-daemon-reload'],
+        'needed_by': ['svc_systemd:telegraf'],
+    }
+    actions['deploy_telegraf_binary'] = {
+        'command': '/usr/local/bin/install_telegraf_binary',
+        'unless': '/usr/bin/telegraf --version | grep {}'.format(telegraf_version),
+        'needs': ['file:/usr/local/bin/install_telegraf_binary'],
+        'triggers': ['action:symlink_systemd_service'],
+    }
+    users['telegraf'] = {
+        'home': '/etc/telegraf',
+        'shell': "/bin/false",
+        'needed_by': ['svc_systemd:telegraf'],
+    }
+
+svc_systemd['telegraf'] = {
+    'needs': [telegraf_dependency],
+}
+
+files['/etc/telegraf/telegraf.conf'] = {
+    'mode': '0444',
+    'content_type': 'mako',
+    'needs': [telegraf_dependency],
+    'triggers': ['svc_systemd:telegraf:restart'],
+    'context': {
+        'telegraf': node.metadata.get('telegraf', {}),
     },
 }
 
@@ -10,30 +63,11 @@ directories = {}
 
 git_deploy = {}
 
-actions = {}
-
-files = {
-    '/etc/telegraf/telegraf.conf': {
-        'mode': '0444',
-        'content_type': 'mako',
-        'needs': ['pkg_dnf:telegraf'],
-        'triggers': ['svc_systemd:telegraf:restart'],
-        'context': {
-            'telegraf': node.metadata.get('telegraf', {}),
-        },
-    },
-}
-
-if not node.metadata.get('telegraf', {}).get('binary_install', False):
-    pkg_dnf['telegraf'] = {
-        'needs': ['action:dnf_makecache'],
-    }
-
 if node.has_bundle('nginx'):
     files['/etc/telegraf/telegraf.d/nginx.conf'] = {
         'owner': 'telegraf',
         'mode': '0400',
-        'needs': ['pkg_dnf:telegraf'],
+        'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
     }
 
@@ -42,7 +76,7 @@ if node.has_bundle('php'):
         'owner': 'telegraf',
         'mode': '0400',
         'content_type': 'mako',
-        'needs': ['pkg_dnf:telegraf'],
+        'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
     }
 
@@ -50,7 +84,7 @@ if node.has_bundle('chrony'):
     files['/etc/telegraf/telegraf.d/chrony.conf'] = {
         'owner': 'telegraf',
         'mode': '0400',
-        'needs': ['pkg_dnf:telegraf'],
+        'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
     }
 
@@ -59,7 +93,7 @@ if node.has_bundle('haproxy'):
         'owner': 'telegraf',
         'mode': '0400',
         'content_type': 'mako',
-        'needs': ['pkg_dnf:telegraf'],
+        'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
     }
 
@@ -67,7 +101,7 @@ if node.has_bundle('hddtemp'):
     files['/etc/telegraf/telegraf.d/hddtemp.conf'] = {
         'owner': 'telegraf',
         'mode': '0400',
-        'needs': ['pkg_dnf:telegraf'],
+        'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
     }
 
@@ -75,7 +109,7 @@ if node.has_bundle('influxdb'):
     files['/etc/telegraf/telegraf.d/influxdb.conf'] = {
         'owner': 'telegraf',
         'mode': '0400',
-        'needs': ['pkg_dnf:telegraf'],
+        'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
     }
 
@@ -83,7 +117,7 @@ if node.has_bundle('kapacitor'):
     files['/etc/telegraf/telegraf.d/kapacitor.conf'] = {
         'owner': 'telegraf',
         'mode': '0400',
-        'needs': ['pkg_dnf:telegraf'],
+        'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
     }
 
@@ -91,7 +125,7 @@ if node.has_bundle('lm-sensors'):
     files['/etc/telegraf/telegraf.d/lm-sensors.conf'] = {
         'owner': 'telegraf',
         'mode': '0400',
-        'needs': ['pkg_dnf:telegraf'],
+        'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
     }
 
@@ -99,7 +133,7 @@ if node.has_bundle('smartmontools'):
     files['/etc/telegraf/telegraf.d/smartmontools.conf'] = {
         'owner': 'telegraf',
         'mode': '0400',
-        'needs': ['pkg_dnf:telegraf'],
+        'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
     }
 
@@ -108,7 +142,7 @@ if node.has_bundle('postgresql'):
         'owner': 'telegraf',
         'mode': '0400',
         'content_type': 'mako',
-        'needs': ['pkg_dnf:telegraf'],
+        'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
     }
 
@@ -117,7 +151,7 @@ if node.has_bundle('atlassian-confluence') or node.has_bundle('atlassian-bitbuck
         'owner': 'telegraf',
         'mode': '0400',
         'content_type': 'mako',
-        'needs': ['pkg_dnf:telegraf'],
+        'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
     }
 
@@ -126,7 +160,7 @@ if node.has_bundle('atlassian-confluence') or node.has_bundle('atlassian-bamboo'
         'owner': 'telegraf',
         'mode': '0400',
         'content_type': 'mako',
-        'needs': ['pkg_dnf:telegraf'],
+        'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
     }
 
@@ -135,7 +169,7 @@ if node.has_bundle('atlassian-confluence'):
         'owner': 'telegraf',
         'mode': '0400',
         'content_type': 'mako',
-        'needs': ['pkg_dnf:telegraf'],
+        'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
     }
 
@@ -143,7 +177,7 @@ if node.has_bundle('xmr-stak'):
     files['/etc/telegraf/telegraf.d/xmr-stak.conf'] = {
         'mode': '0444',
         'content_type': 'mako',
-        'needs': ['pkg_dnf:telegraf'],
+        'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
     }
 
@@ -151,7 +185,7 @@ if node.metadata.get('telegraf', {}).get('collectd_input', {}):
     files['/etc/telegraf/telegraf.d/collectd.conf'] = {
         'mode': '0444',
         'content_type': 'mako',
-        'needs': ['pkg_dnf:telegraf'],
+        'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
         'context': {
             'server': node.metadata.get('telegraf', {}).get('collectd_input', {}),
@@ -160,7 +194,7 @@ if node.metadata.get('telegraf', {}).get('collectd_input', {}):
     files['/etc/telegraf/collectd_auth_file'] = {
         'mode': '0444',
         'content_type': 'mako',
-        'needs': ['pkg_dnf:telegraf'],
+        'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
         'context': {
             'server': node.metadata.get('telegraf', {}).get('collectd_input', {}),
@@ -168,7 +202,7 @@ if node.metadata.get('telegraf', {}).get('collectd_input', {}):
     }
     files['/etc/telegraf/collectd_types.db'] = {
         'mode': '0444',
-        'needs': ['pkg_dnf:telegraf'],
+        'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
     }
 
@@ -215,6 +249,6 @@ for config in node.metadata.get('telegraf', {}).get('custom_configs', {}):
         'source': '{}.{}'.format(node.name, config),
         'mode': '0444',
         'content_type': 'mako',
-        'needs': ['pkg_dnf:telegraf'],
+        'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
     }
