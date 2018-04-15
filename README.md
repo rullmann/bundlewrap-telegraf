@@ -88,6 +88,11 @@ InfluxData provides repositories for various distributions, but only limited sup
 Enabling this option will not use `pkg_dnf` items. Instead it will deploy an install script and perform other necessary steps to get telegraf up and running.
 Simply set `binary_install` to `True` to use this option.
 
+### Synology monitoring
+
+Monitor your Synology NAS with this option. The config is available at [Githuby by jperrilo](https://github.com/jperillo/Synology_dashboard_grafana).
+A Grafana dashboard can be found [here](https://grafana.com/dashboards/1727).
+
 ### Custom Configurations
 
 This bundle allows you to add custom telegraf configuration files. This may be useful if you want to monitor a webservice or grab data from other api not related to any of your bundles.
