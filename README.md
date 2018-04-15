@@ -71,6 +71,9 @@ Apply this bundle on one node as a start if the telegraf influxdb database hasn'
                 'someconfig',
             },
             'binary_install': False, # optional, installs telegraf armhf binary (e.g. for Raspberry Pi 3)
+            'synology': { # optional, enable synology nas monitoring with snmp
+                'agents': ['mynas'], # ip addresses or hostnames of your synology nas devices
+            },
         },
     }
 

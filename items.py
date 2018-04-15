@@ -244,6 +244,21 @@ if node.metadata.get('telegraf', {}).get('collectd_input', {}):
                 'triggers': ['action:firewalld_reload'],
             }
 
+if node.metadata.get('telegraf', {}).get('synology', False):
+    files['/etc/telegraf/telegraf.d/synology.conf'] = {
+        'mode': '0444',
+        'content_type': 'mako',
+        'needs': [telegraf_dependency],
+        'triggers': ['svc_systemd:telegraf:restart'],
+    }
+    synology_mibs = ['HOST-RESOURCES-MIB.txt', 'IF-MIB.txt', 'RFC1213-MIB.txt', 'SYNOLOGY-DISK-MIB.txt', 'SYNOLOGY-ISCSILUN-MIB.txt', 'SYNOLOGY-RAID-MIB.txt', 'SYNOLOGY-SERVICES-MIB.txt', 'SYNOLOGY-SMART-MIB.txt', 'SYNOLOGY-SPACEIO-MIB.txt', 'SYNOLOGY-STORAGEIO-MIB.txt', 'SYNOLOGY-SYSTEM-MIB.txt', 'SYNOLOGY-UPS-MIB.txt', 'UCD-DEMO-MIB.txt', 'UCD-DISKIO-MIB.txt', 'UCD-DLMOD-MIB.txt', 'UCD-IPFILTER-MIB.txt', 'UCD-IPFWACC-MIB.txt', 'UCD-SNMP-MIB-OLD.txt', 'UCD-SNMP-MIB.txt']
+    for mib in synology_mibs:
+        files['/usr/share/snmp/mibs/{}'.format(mib)] = {
+            'source': 'synology_mibs/{}'.format(mib),
+            'mode': '0444',
+            'triggers': ['svc_systemd:telegraf:restart'],
+        }
+
 for config in node.metadata.get('telegraf', {}).get('custom_configs', {}):
     files['/etc/telegraf/telegraf.d/{}.conf'.format(config)] = {
         'source': '{}.{}'.format(node.name, config),
