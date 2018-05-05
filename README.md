@@ -37,8 +37,11 @@ Apply this bundle on one node as a start if the telegraf influxdb database hasn'
   * [atlassian-bamboo](https://github.com/rullmann/bundlewrap-atlassian-bamboo)
   * [xmr-stak](https://github.com/rullmann/bundlewrap-xmr-stak)
     * Defaults to http port 8080. http service must be enabled but can be configured in the xmr-stak bundle
-  * Any generic Java VM by setting up proper metadata
-  * Any generic Tomcat by setting up proper metadata
+
+* Generic:
+  * Java VM
+  * Tomcat
+  * [rtorrent](https://github.com/rakshasa/rtorrent)
 
 ## Metadata
 
@@ -74,6 +77,9 @@ Apply this bundle on one node as a start if the telegraf influxdb database hasn'
             'synology': { # optional, enable synology nas monitoring with snmp
                 'agents': ['mynas'], # ip addresses or hostnames of your synology nas devices
             },
+            'rtorrent': { # optional, to enable rtorrent monitoring
+                'url': 'https://localhost/RPC', # make sure this url is accessible by your telegraf node without authentication
+            },
         },
     }
 
@@ -90,8 +96,17 @@ Simply set `binary_install` to `True` to use this option.
 
 ### Synology monitoring
 
-Monitor your Synology NAS with this option. The config is available at [Githuby by jperrilo](https://github.com/jperillo/Synology_dashboard_grafana).
+Monitor your Synology NAS with this option. The config is available on [Github by jperrilo](https://github.com/jperillo/Synology_dashboard_grafana).
 A Grafana dashboard can be found [here](https://grafana.com/dashboards/1727).
+
+### rtorrent monitoring
+
+Enabling the option as described above will monitor your rtorrent instance. RPC must be available without a password.
+You can then use [this dashboard](extras/rtorrent_simple.json) in your Grafana to visualize the data.
+
+Which will give you a dashboard like this:
+
+![grafana rtorrent simple dashboard](extras/rtorrent_simple.png)
 
 ### Custom Configurations
 

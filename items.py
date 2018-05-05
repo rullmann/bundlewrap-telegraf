@@ -181,6 +181,21 @@ if node.has_bundle('xmr-stak'):
         'triggers': ['svc_systemd:telegraf:restart'],
     }
 
+if node.metadata.get('telegraf', {}).get('rtorrent', {}):
+    files['/etc/telegraf/telegraf.d/rtorrent.conf'] = {
+        'mode': '0444',
+        'needs': [telegraf_dependency],
+        'triggers': ['svc_systemd:telegraf:restart'],
+    }
+    files['/usr/local/bin/telegraf_rtorrent'] = {
+        'source': 'rtorrent.py',
+        'owner': 'telegraf',
+        'mode': '0700',
+        'content_type': 'mako',
+        'needs': [telegraf_dependency],
+        'triggers': ['svc_systemd:telegraf:restart'],
+    }
+
 if node.metadata.get('telegraf', {}).get('collectd_input', {}):
     files['/etc/telegraf/telegraf.d/collectd.conf'] = {
         'mode': '0444',
