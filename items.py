@@ -50,7 +50,8 @@ svc_systemd['telegraf'] = {
 }
 
 files['/etc/telegraf/telegraf.conf'] = {
-    'mode': '0444',
+    'mode': '0400',
+    'owner': 'telegraf',
     'content_type': 'mako',
     'needs': [telegraf_dependency],
     'triggers': ['svc_systemd:telegraf:restart'],
@@ -175,7 +176,8 @@ if node.has_bundle('atlassian-confluence'):
 
 if node.has_bundle('xmr-stak'):
     files['/etc/telegraf/telegraf.d/xmr-stak.conf'] = {
-        'mode': '0444',
+        'owner': 'telegraf',
+        'mode': '0400',
         'content_type': 'mako',
         'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
@@ -183,7 +185,8 @@ if node.has_bundle('xmr-stak'):
 
 if node.metadata.get('telegraf', {}).get('rtorrent', {}):
     files['/etc/telegraf/telegraf.d/rtorrent.conf'] = {
-        'mode': '0444',
+        'owner': 'telegraf',
+        'mode': '0400',
         'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
     }
@@ -198,7 +201,8 @@ if node.metadata.get('telegraf', {}).get('rtorrent', {}):
 
 if node.metadata.get('telegraf', {}).get('collectd_input', {}):
     files['/etc/telegraf/telegraf.d/collectd.conf'] = {
-        'mode': '0444',
+        'owner': 'telegraf',
+        'mode': '0400',
         'content_type': 'mako',
         'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
@@ -207,7 +211,8 @@ if node.metadata.get('telegraf', {}).get('collectd_input', {}):
         },
     }
     files['/etc/telegraf/collectd_auth_file'] = {
-        'mode': '0444',
+        'owner': 'telegraf',
+        'mode': '0400',
         'content_type': 'mako',
         'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
@@ -216,7 +221,8 @@ if node.metadata.get('telegraf', {}).get('collectd_input', {}):
         },
     }
     files['/etc/telegraf/collectd_types.db'] = {
-        'mode': '0444',
+        'owner': 'telegraf',
+        'mode': '0400',
         'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
     }
@@ -261,7 +267,8 @@ if node.metadata.get('telegraf', {}).get('collectd_input', {}):
 
 if node.metadata.get('telegraf', {}).get('synology', False):
     files['/etc/telegraf/telegraf.d/synology.conf'] = {
-        'mode': '0444',
+        'owner': 'telegraf',
+        'mode': '0400',
         'content_type': 'mako',
         'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
@@ -277,7 +284,8 @@ if node.metadata.get('telegraf', {}).get('synology', False):
 for config in node.metadata.get('telegraf', {}).get('custom_configs', {}):
     files['/etc/telegraf/telegraf.d/{}.conf'.format(config)] = {
         'source': '{}.{}'.format(node.name, config),
-        'mode': '0444',
+        'owner': 'telegraf',
+        'mode': '0400',
         'content_type': 'mako',
         'needs': [telegraf_dependency],
         'triggers': ['svc_systemd:telegraf:restart'],
