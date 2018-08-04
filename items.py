@@ -16,14 +16,15 @@ if node.metadata.get('telegraf', {}).get('binary_install', False) == False:
         'needs': ['action:dnf_makecache'],
     }
 else:
-    telegraf_dependency = 'action:deploy_telegraf_binary'
-    telegraf_version = node.metadata.get('telegraf', {}).get('version', '1.5.3')
+    telegraf_dependency = 'action:chmod_telegraf_binary'
+    telegraf_version = node.metadata.get('telegraf', {}).get('version', '1.7.2')
     files['/usr/local/bin/install_telegraf_binary'] = {
         'mode': '0700',
         'content_type': 'mako',
         'context': {
             'telegraf_version': telegraf_version,
         },
+        'needs': ['pkg_dnf:wget'],
     }
     actions['symlink_systemd_service'] = {
         'command': '/usr/bin/systemctl link /usr/lib/telegraf/scripts/telegraf.service',
@@ -43,6 +44,11 @@ else:
         'home': '/etc/telegraf',
         'shell': "/bin/false",
         'needed_by': ['svc_systemd:telegraf'],
+    }
+    actions['chmod_telegraf_binary'] = {
+        'command': 'chown root:telegraf /usr/bin/telegraf',
+        'unless': 'ls /usr/bin/telegraf -l | grep \'root telegraf\'',
+        'needs': ['action:deploy_telegraf_binary'],
     }
 
 svc_systemd['telegraf'] = {
