@@ -50,6 +50,7 @@ Apply this bundle on one node as a start if the telegraf influxdb database hasn'
             'influxdb_url': 'http://127.0.0.1:8086', # optional
             'username': 'telegraf', # optional, influxdb user
             'password': 'mysupersecretpassword', # required, password for influxdb user
+            'collect_conntrack': True, # optional
             'collect_cpu', True, # optional
             'collect_disk', True, # optional
             'collect_kernel', True, # optional
