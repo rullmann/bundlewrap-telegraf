@@ -2,6 +2,6 @@
 
 set -e
 
-wget -q https://dl.influxdata.com/telegraf/releases/telegraf-${telegraf_version}_linux_armhf.tar.gz -O /tmp/telegraf-${telegraf_version}_linux_armhf.tar.gz
-tar xf /tmp/telegraf-${telegraf_version}_linux_armhf.tar.gz -C /tmp/
+wget -q https://dl.influxdata.com/telegraf/releases/telegraf-${telegraf_version}_linux_${telegraf_arch}.tar.gz -O /tmp/telegraf-${telegraf_version}_linux_${telegraf_arch}.tar.gz
+tar xf /tmp/telegraf-${telegraf_version}_linux_${telegraf_arch}.tar.gz -C /tmp/
 rsync -r /tmp/telegraf/* /

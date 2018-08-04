@@ -18,17 +18,19 @@ if node.metadata.get('telegraf', {}).get('binary_install', False) == False:
 else:
     telegraf_dependency = 'action:chmod_telegraf_binary'
     telegraf_version = node.metadata.get('telegraf', {}).get('version', '1.7.2')
+    telegraf_arch = node.metadata.get('telegraf', {}).get('arch', 'armhf')
     files['/usr/local/bin/install_telegraf_binary'] = {
         'mode': '0700',
         'content_type': 'mako',
         'context': {
             'telegraf_version': telegraf_version,
+            'telegraf_arch': telegraf_arch,
         },
         'needs': ['pkg_dnf:wget'],
     }
     actions['symlink_systemd_service'] = {
         'command': '/usr/bin/systemctl link /usr/lib/telegraf/scripts/telegraf.service',
-        'unless': 'file -E /usr/lib/telegraf/scripts/telegraf.service',
+        'unless': 'file -E /etc/systemd/system/telegraf.service',
         'needs': ['file:/usr/local/bin/install_telegraf_binary'],
         'triggered': True,
         'triggers': ['action:systemd-daemon-reload'],
