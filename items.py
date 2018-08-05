@@ -57,6 +57,14 @@ svc_systemd['telegraf'] = {
     'needs': [telegraf_dependency],
 }
 
+directories = {
+    '/etc/telegraf/telegraf.d': {
+        'mode': '0700',
+        'owner': 'telegraf',
+        'triggers': ['svc_systemd:telegraf:restart'],
+    },
+}
+
 files['/etc/telegraf/telegraf.conf'] = {
     'mode': '0400',
     'owner': 'telegraf',
@@ -67,8 +75,6 @@ files['/etc/telegraf/telegraf.conf'] = {
         'telegraf': node.metadata.get('telegraf', {}),
     },
 }
-
-directories = {}
 
 git_deploy = {}
 
