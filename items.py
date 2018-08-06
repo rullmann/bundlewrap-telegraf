@@ -62,6 +62,7 @@ directories = {
         'mode': '0700',
         'owner': 'telegraf',
         'triggers': ['svc_systemd:telegraf:restart'],
+        'needs': [telegraf_dependency],
     },
 }
 
